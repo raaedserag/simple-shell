@@ -4,7 +4,7 @@
     #include <fcntl.h>
 
     // Required Libraries
-    #include <string.h>     
+    #include <string.h>
     #include <ctype.h>      // isalnum()
     #include <sys/types.h>  // fork() execvp() waitpid()
     #include <sys/wait.h>   // waitpid()
@@ -134,7 +134,7 @@
      anyway to guarantee the white spaces around the redirections so it can be split as one word */
      // We are reading a char by char from entered_line and write the processed chars to edited_line
     void read_line(){   // fgets() is a standard function reads the stdin and put the input into array of characters that passed to it
-        fgets(entered_line, MAX_CHAR, stdin);     
+        fgets(entered_line, MAX_CHAR, stdin);
 
         int i=0 ;           // array indicator for the array: entered_line
         int j = 0 ;         // array indicator for the array: edited_line
@@ -165,7 +165,7 @@
             }
             // Move the entered_line indicator to the next element
             i++ ;
-            
+
         } while(entered_line[i] != '\n' && entered_line[i+1] != '\0') ;      // Continue until the next element becomes Null, then it's the end of line
 
     }
@@ -288,13 +288,13 @@ int piping_exec()
                         pid_2 = fork() ;
 
                         if (pid_2>0){     // parent of the child
-                            
+
                             waitpid(pid_2, 0, 0) ;
                             if(out_red.count>0)
                             {
                                 output_redirecting();
                             }
-                        
+
                             close(piping_arr[1]) ;
                             dup2(piping_arr[0], STDIN_FILENO) ;
                             execvp(word[pipe_red.index + 1], &word[pipe_red.index + 1]) ;

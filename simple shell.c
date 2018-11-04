@@ -114,11 +114,11 @@
     // This Function returns:  1 => Permitted character,  2 => Redirection character,  0 => Denied character
     int testing_char(char c){
         // isalnum() is a standard function returns 0 if the passed character isn't a letter nor digit
-        if (isalnum(c) != 0 || c == ' ' || '-')
+        if (isalnum(c) != 0 || c == ' ' || c == '-')
         {
             return 1 ;
         }
-        else if(c== '<' || c=='>' || c=='|')
+        else if(c== '<' || c =='>' || c=='|')
         {
             return 2 ;
         }

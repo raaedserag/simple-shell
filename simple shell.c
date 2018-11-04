@@ -55,8 +55,6 @@
         while(1)  // We are taking user's commands for ever until he inputs exit, then the loop will break
             {
 
-            // First of all, reset all flags
-            resetting_flags();
 
             printf("%s","sish:> ") ;    // Shell style:    sish:> command_line
             read_line();                // Start reading the user's command line and arrange it
@@ -65,10 +63,10 @@
 
             // First, In the case that the user has inputted 1 word, and consist of 4 chars and equals to "exit"
             // Or EOF signal has been risen
-            if     (words_num ==1 && word[0][4] == '\0' && strncmp(word[0], "exit", 4) == 0 || feof(stdin))
+            if     ( (words_num ==1 && word[0][4] == '\0' && strncmp(word[0], "exit", 4) == 0) || feof(stdin))
                 {
                 printf("%s\n", "Terminating...") ;
-                break ;                             // Break the loop and end the program
+                exit(1) ;                             // Break the loop and end the program
                 }
 
             // Second, If the user hasn't input any words
@@ -103,6 +101,8 @@
                 }
 
             }
+	    // reset all flags
+            resetting_flags();
     }
 
     return 0 ;
@@ -133,8 +133,10 @@
     second, since it's requested that the white spaces around the redirections are optional, so we will put them around it
      anyway to guarantee the white spaces around the redirections so it can be split as one word */
      // We are reading a char by char from entered_line and write the processed chars to edited_line
-    void read_line(){   // fgets() is a standard function reads the stdin and put the input into array of characters that passed to it
-        fgets(entered_line, MAX_CHAR, stdin);
+    void read_line(){  
+	    
+	// fgets() is a standard function reads the stdin and put the input into array of characters that passed to it    
+	fgets(entered_line, MAX_CHAR, stdin);
 
         int i=0 ;           // array indicator for the array: entered_line
         int j = 0 ;         // array indicator for the array: edited_line
@@ -269,6 +271,7 @@ int command_exec()
             }
 
         execvp(word[0], word) ;
+	exit(0) ;
             }  // execute the command
 
     else
@@ -298,6 +301,7 @@ int piping_exec()
                             close(piping_arr[1]) ;
                             dup2(piping_arr[0], STDIN_FILENO) ;
                             execvp(word[pipe_red.index + 1], &word[pipe_red.index + 1]) ;
+			    exit(0) ;	
                         }
                         else
                             {     // child of the child
@@ -308,6 +312,7 @@ int piping_exec()
                             close(piping_arr[0]);
                             dup2(piping_arr[1], STDOUT_FILENO) ;
                             execvp(word[0], word) ;
+			    exit(0) ;
                             }
                     }
 
@@ -329,9 +334,9 @@ int piping_exec()
 
 void resetting_flags()
 {
-    memset(entered_line, 0, MAX_CHAR) ;     // memset() is a standard function
-    memset(edited_line, 0, 2*MAX_CHAR) ;    // Parameters(array to be set, setting value, length of array )
-    memset(word, 0, MAX_WORDS) ;            // We are choosing setting value of 0 because we want to clear the arrays
+    memset(entered_line, '\0', MAX_CHAR) ;     // memset() is a standard function
+    memset(edited_line, '\0', 2*MAX_CHAR) ;    // Parameters(array to be set, setting value, length of array )
+    memset(word, '\0', MAX_WORDS) ;            // We are choosing setting value of 0 because we want to clear the arrays
     in_red.count = 0 ; out_red.count = 0 ; pipe_red.count = 0 ;
 
 }

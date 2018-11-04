@@ -198,22 +198,22 @@
                 int k ;
                 for(k=0; k<i; k++){
                     if(strncmp(word[k], "<", 1) == 0){
-                        if (in_red.count  == 1){
+                        if (in_red.count  > 0){
                             return -2 ;
                         }
                         else{
-                            in_red.count = 1 ;
+                            in_red.count ++ ;
                             in_red.index = k ;
                             word[k] = NULL ;
                         }
 
                     }
                     else if(strncmp(word[k], ">", 1) == 0){
-                        if (out_red.count == 1){
+                        if (out_red.count > 0){
                             return -2 ;
                         }
                         else{
-                            out_red.count = 1 ;
+                            out_red.count ++ ;
                             out_red.index = k ;
                             word[k] = NULL ;
                         }
@@ -221,11 +221,11 @@
                     }
                     else if(strncmp(word[k], "|", 1) == 0)
                         {
-                        if (pipe_red.count == 1){
+                        if (pipe_red.count > 0){
                             return -2 ;
                         }
                         else{
-                            pipe_red.count = 1 ;
+                            pipe_red.count ++ ;
                             pipe_red.index = k ;
                             word[k] = NULL ;
 

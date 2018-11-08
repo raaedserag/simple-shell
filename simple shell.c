@@ -12,7 +12,15 @@
     #define MAX_CHAR 100    // Maximum number of character that user should enter
     #define MAX_WORDS 15    // Maximum number of words in the command line
     #define DEL " "         // The delimiter, that will separate each word
-
+    
+    // Defining some colors :D :D 
+    #define C_RED     "\x1b[91m"
+    #define C_GREEN   "\x1b[92m"
+    #define C_YELLOW  "\x1b[93m"
+    #define C_BLUE    "\x1b[94m"
+    #define C_MAGNETA "\x1b[95m"
+    #define C_CYAN    "\x1b[96m"
+    #define C_RESET   "\x1b[0m"
 //-
     struct red{
         int count ;
@@ -27,8 +35,8 @@
     // Defining Needed Global Variables
     char entered_line[MAX_CHAR] ;   // It will hold the  string input from the user
     char edited_line[2*MAX_CHAR] ;  // It will hold the previous string input from the user after checking each character
-    char* word[MAX_WORDS+1] ;         // It will hold a pointers to the words strings after splitting the user input
-
+    char* word[MAX_WORDS+1] ;       // It will hold a pointers to the words strings after splitting the user input
+    char cwd[30] ;                    // This will hold the current directory name    
     int words_num ;                 // It will hold the number of words in command line
     pid_t pid_1 ;
     pid_t pid_2 ;
@@ -42,14 +50,12 @@
 
     void input_redirecting();
     void output_redirecting() ;
-    int command_exec();
-    int piping_exec() ;
+    void command_exec();
+    void piping_exec() ;
     void resetting_flags() ;
 
 
-    int main()
-
-    {
+int main(){
 
 
         while(1)  // We are taking user's commands for ever until he inputs exit, then the loop will break
@@ -57,36 +63,40 @@
 
             // First of all, reset all flags
             resetting_flags();
-
-            printf("%s","sish:> ") ;    // Shell style:    sish:> command_line
+            getcwd(cwd, 30) ;
+            // Shell style:    sish:>DIRECTORY$ command_line
+            printf("%s%s%s%s%s$ %s", C_GREEN,"sish:>", C_BLUE, cwd, C_GREEN, C_CYAN) ;    
             read_line();                // Start reading the user's command line and arrange it
-
+            
+            
             words_num = parse_line() ; // Start splitting the user's command line and get the number of command words
 
             // First, In the case that the user has inputted 1 word, and consist of 4 chars and equals to "exit"
             // Or EOF signal has been risen
             if     (words_num ==1 && word[0][4] == '\0' && strncmp(word[0], "exit", 4) == 0 || feof(stdin))
                 {
-                printf("%s\n", "Terminating...") ;
-                break ;                             // Break the loop and end the program
+                    printf(C_RED);    // Changing the output color
+                    printf("%s%s\n", C_RED, "Terminating...") ;
+                    exit(0) ;                             // End the program
                 }
 
             // Second, If the user hasn't input any words
             else if(words_num == 0)
                 {
-                printf("%s\n","No command has been entered") ;
+                    printf("%s%s\n", C_RED,"No command has been entered") ;
                 }
 
             // Third, If the command words is greater than permissible
             else if(words_num == -1)
                 {
-                printf("Error: Only %d words are allowed in one command line\n", MAX_WORDS);
+                    printf("%sError: Only %s%d%s words are allowed in one command line\n",C_RED, C_MAGNETA, MAX_WORDS, C_RED);
                 }
 
             //-
             else if(words_num == -2)
                 {
-                printf("%s\n","Syntax Error") ;
+                    
+                    printf("%s%s\n", C_RED,"Syntax Error") ;
                 }
 
             // The desired case, if the users has inputted a number of words as a command
@@ -114,7 +124,7 @@
     // This Function returns:  1 => Permitted character,  2 => Redirection character,  0 => Denied character
     int testing_char(char c){
         // isalnum() is a standard function returns 0 if the passed character isn't a letter nor digit
-        if (isalnum(c) != 0 || c == ' ' || c == '-' || c == '/' || c== '$')
+        if (isalnum(c) != 0 || c == ' ' || c == '.'|| c == '-' || c == '/' || c== '$')
         {
             return 1 ;
         }
@@ -252,33 +262,49 @@ void output_redirecting()
     dup2(open(output_file, O_RDWR| O_CREAT, 0777) , 1) ;
 }
 
-int command_exec()
+void command_exec()
 {
-    pid_1 = fork() ;
-
-    if ( pid_1 == 0)
-        {   // child process
-        if (in_red.count == 1)
-            {
-            input_redirecting() ;
-            }
-
-        else if (out_red.count == 1)
-            {
-            output_redirecting() ;
-            }
-
-        execvp(word[0], word) ;
-            }  // execute the command
-
-    else
-        {         // parent process
-        waitpid(pid_1, 0, 0);      // wait for the child process to finish and do nothing => continue the while loop
+    // If it's a CD command
+    if (strncmp(word[0], "cd", 2) == 0)
+    {
+        if (chdir(word[1]) == -1) // Try the CD Command and check if it hasn't been Succeeded
+        {   
+            printf("%s%s%s%s\n", C_MAGNETA,word[1], C_RED, ": No such directory") ;
         }
+        
     }
+    
+    
+    // Not a CD Command
+    else
+    {
+        pid_1 = fork() ;
+        if ( pid_1 == 0)    // child process
+            {   
 
+            if (in_red.count == 1)
+                {
+                input_redirecting() ;
+                }
 
-int piping_exec()
+            else if (out_red.count == 1)
+                {
+                output_redirecting() ;
+                }
+            execvp(word[0], word) ;     // execute the command
+            printf("%s%s%s%s\n", C_RED, "Error in command: ", C_MAGNETA, word[0] );
+            exit(1) ;
+                
+            }  
+
+        else
+            {         // parent process
+            waitpid(pid_1, 0, 0);      // wait for the child process to finish and do nothing => continue the while loop
+            }
+    }
+}
+
+void piping_exec()
 {
     pid_1 = fork() ;
     if(pid_1 ==0)
@@ -297,6 +323,9 @@ int piping_exec()
                 close(piping_arr[1]) ;
                 dup2(piping_arr[0], STDIN_FILENO) ;
                 execvp(word[pipe_red.index + 1], &word[pipe_red.index + 1]) ;
+                printf("%s%s%s%s\n", C_RED, "Error in command: ", C_MAGNETA, word[pipe_red.index + 1] );
+                exit(1) ;
+
             }
             else
                 {     // child of the child
@@ -307,6 +336,9 @@ int piping_exec()
                 close(piping_arr[0]);
                 dup2(piping_arr[1], STDOUT_FILENO) ;
                 execvp(word[0], word) ;
+                printf("%s%s%s%s\n",C_RED, "Error in command: ", C_MAGNETA, word[0] );
+                exit(1) ;
+
                 }
         }
 

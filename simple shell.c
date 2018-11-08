@@ -36,7 +36,7 @@
     char entered_line[MAX_CHAR] ;   // It will hold the  string input from the user
     char edited_line[2*MAX_CHAR] ;  // It will hold the previous string input from the user after checking each character
     char* word[MAX_WORDS+1] ;       // It will hold a pointers to the words strings after splitting the user input
-    char cwd[30] ;                    // This will hold the current directory name    
+    char cwd[100] ;                    // This will hold the current directory name    
     int words_num ;                 // It will hold the number of words in command line
     pid_t pid_1 ;
     pid_t pid_2 ;
@@ -63,7 +63,7 @@ int main(){
 
             // First of all, reset all flags
             resetting_flags();
-            getcwd(cwd, 30) ;
+            getcwd(cwd, 100) ;
             // Shell style:    sish:>DIRECTORY$ command_line
             printf("%s%s%s%s%s$ %s", C_GREEN,"sish:>", C_BLUE, cwd, C_GREEN, C_CYAN) ;    
             read_line();                // Start reading the user's command line and arrange it

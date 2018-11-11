@@ -76,7 +76,6 @@ int main()
         // Or EOF signal has been risen
         if     (words_num ==1 && word[0][4] == '\0' && strncmp(word[0], "exit", 4) == 0 || feof(stdin))
             {
-                printf(C_RED);    // Changing the output color
                 printf("%s%s\n", C_RED, "Terminating...") ;
                 exit(0) ;                             // End the program
             }

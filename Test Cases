@@ -1,6 +1,8 @@
-1- ls //simple command
-2- ls -a //simple command with multiple input
-3- ls > x , cat x //output redirection
-4- cat < x //input redirection
-5- ls | head -3 //simple piping
-6- ls | cat > xy //simple piping with output redirection
+1- ls                     // simple command
+2- ls -a                  // simple command with multiple input
+3- ls > x , cat x         // output redirection
+4- cat < x                // input redirection
+5- ls | head -3           // simple piping
+6- ls | cat > xy          // simple piping with output redirection
+7- mkdir ram.time         // creating directory
+8- cd ram.time            // change the directory
